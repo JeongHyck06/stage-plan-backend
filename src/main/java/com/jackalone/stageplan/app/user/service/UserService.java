@@ -27,7 +27,7 @@ public class UserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
-                .role(request.getRole())
+                .role(User.Role.USER)
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -36,7 +36,6 @@ public class UserService {
                 .id(savedUser.getId())
                 .email(savedUser.getEmail())
                 .name(savedUser.getName())
-                .role(savedUser.getRole())
                 .build();
     }
 
@@ -48,13 +47,12 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String accessToken = jwtTokenProvider.generateToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtTokenProvider.generateToken(user.getEmail());
 
         UserDto.Response userResponse = UserDto.Response.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .role(user.getRole())
                 .build();
 
         return UserDto.TokenResponse.builder()
@@ -73,7 +71,6 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .role(user.getRole())
                 .build();
     }
 }

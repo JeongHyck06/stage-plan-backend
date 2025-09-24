@@ -28,7 +28,6 @@ public class UserDto {
         @NotBlank(message = "이름은 필수입니다.")
         private String name;
 
-        private User.Role role = User.Role.USER;
     }
 
     @Data
@@ -52,7 +51,6 @@ public class UserDto {
         private Long id;
         private String email;
         private String name;
-        private User.Role role;
     }
 
     @Data
