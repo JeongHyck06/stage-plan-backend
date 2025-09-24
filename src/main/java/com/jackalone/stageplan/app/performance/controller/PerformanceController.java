@@ -30,9 +30,20 @@ public class PerformanceController {
     public ResponseEntity<PerformanceDto.Response> createPerformance(
             @Valid @RequestBody PerformanceDto.CreateRequest request,
             Authentication authentication) {
-        String userEmail = authentication.getName();
-        PerformanceDto.Response response = performanceService.createPerformance(userEmail, request);
-        return ResponseEntity.ok(response);
+        try {
+            System.out.println("Creating performance for user: " + authentication.getName());
+            System.out.println("Request data: " + request.toString());
+            
+            String userEmail = authentication.getName();
+            PerformanceDto.Response response = performanceService.createPerformance(userEmail, request);
+            
+            System.out.println("Performance created successfully with ID: " + response.getId());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.err.println("Error creating performance: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @GetMapping

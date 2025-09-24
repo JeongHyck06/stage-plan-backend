@@ -20,6 +20,7 @@ public class PerformanceDto {
         @NotBlank(message = "제목은 필수입니다.")
         private String title;
 
+        @NotBlank(message = "공연 소개는 필수입니다.")
         private String content;
 
         @NotBlank(message = "위치는 필수입니다.")
@@ -28,8 +29,10 @@ public class PerformanceDto {
         @NotNull(message = "공연 날짜는 필수입니다.")
         private LocalDateTime performanceDate;
 
+        @NotBlank(message = "장르는 필수입니다.")
         private String genre;
 
+        @NotBlank(message = "밴드명은 필수입니다.")
         private String bandName;
 
         private Integer ticketPrice;

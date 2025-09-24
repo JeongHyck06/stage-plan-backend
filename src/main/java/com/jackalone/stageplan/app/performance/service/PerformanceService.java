@@ -22,25 +22,44 @@ public class PerformanceService {
     private final UserRepository userRepository;
 
     public PerformanceDto.Response createPerformance(String userEmail, PerformanceDto.CreateRequest request) {
+        System.out.println("Service: Creating performance for user: " + userEmail);
+        System.out.println("Service: Request title: " + request.getTitle());
+        System.out.println("Service: Request location: " + request.getLocation());
+        System.out.println("Service: Request performanceDate: " + request.getPerformanceDate());
+        
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> {
+                    System.err.println("User not found for email: " + userEmail);
+                    return new IllegalArgumentException("존재하지 않는 사용자입니다.");
+                });
 
-        Performance performance = Performance.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .location(request.getLocation())
-                .performanceDate(request.getPerformanceDate())
-                .genre(request.getGenre())
-                .bandName(request.getBandName())
-                .ticketPrice(request.getTicketPrice())
-                .maxAudience(request.getMaxAudience())
-                .status(Performance.Status.ACTIVE)
-                .user(user)
-                .build();
+        System.out.println("Service: Found user: " + user.getName() + " (ID: " + user.getId() + ")");
 
-        Performance savedPerformance = performanceRepository.save(performance);
+        try {
+            Performance performance = Performance.builder()
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .location(request.getLocation())
+                    .performanceDate(request.getPerformanceDate())
+                    .genre(request.getGenre())
+                    .bandName(request.getBandName())
+                    .ticketPrice(request.getTicketPrice())
+                    .maxAudience(request.getMaxAudience())
+                    .status(Performance.Status.ACTIVE)
+                    .user(user)
+                    .build();
 
-        return convertToResponse(savedPerformance);
+            System.out.println("Service: Built performance entity");
+            
+            Performance savedPerformance = performanceRepository.save(performance);
+            System.out.println("Service: Saved performance with ID: " + savedPerformance.getId());
+
+            return convertToResponse(savedPerformance);
+        } catch (Exception e) {
+            System.err.println("Service: Error creating performance: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("공연 등록 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 
     @Transactional(readOnly = true)
