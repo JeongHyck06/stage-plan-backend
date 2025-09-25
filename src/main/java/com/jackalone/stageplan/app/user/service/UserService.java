@@ -32,11 +32,7 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return UserDto.Response.builder()
-                .id(savedUser.getId())
-                .email(savedUser.getEmail())
-                .name(savedUser.getName())
-                .build();
+        return convertToResponse(savedUser);
     }
 
     public UserDto.TokenResponse signIn(UserDto.SignInRequest request) {
@@ -49,11 +45,7 @@ public class UserService {
 
         String accessToken = jwtTokenProvider.generateToken(user.getEmail());
 
-        UserDto.Response userResponse = UserDto.Response.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .build();
+        UserDto.Response userResponse = convertToResponse(user);
 
         return UserDto.TokenResponse.builder()
                 .accessToken(accessToken)
@@ -67,11 +59,59 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
+        return convertToResponse(user);
+    }
+
+    public UserDto.Response updateProfile(String email, UserDto.UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (request.getNickname() != null) user.setNickname(request.getNickname());
+        if (request.getInstagramId() != null) user.setInstagramId(request.getInstagramId());
+        if (request.getBandName() != null) user.setBandName(request.getBandName());
+        if (request.getProfileImageUrl() != null) user.setProfileImageUrl(request.getProfileImageUrl());
+        if (request.getRepresentativeVideoUrl() != null) user.setRepresentativeVideoUrl(request.getRepresentativeVideoUrl());
+        if (request.getFavoriteGenres() != null) user.setFavoriteGenres(request.getFavoriteGenres());
+        if (request.getBio() != null) user.setBio(request.getBio());
+
+        User updatedUser = userRepository.save(user);
+        return convertToResponse(updatedUser);
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto.Response getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return convertToResponse(user);
+    }
+
+    public UserDto.TokenResponse refreshToken(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        String newAccessToken = jwtTokenProvider.generateToken(user.getEmail());
+        UserDto.Response userResponse = convertToResponse(user);
+
+        return UserDto.TokenResponse.builder()
+                .accessToken(newAccessToken)
+                .expiresIn(jwtTokenProvider.getExpiration())
+                .user(userResponse)
+                .build();
+    }
+
+    private UserDto.Response convertToResponse(User user) {
         return UserDto.Response.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
+                .nickname(user.getNickname())
+                .instagramId(user.getInstagramId())
+                .bandName(user.getBandName())
+                .profileImageUrl(user.getProfileImageUrl())
+                .representativeVideoUrl(user.getRepresentativeVideoUrl())
+                .favoriteGenres(user.getFavoriteGenres())
+                .bio(user.getBio())
                 .build();
     }
 }
-

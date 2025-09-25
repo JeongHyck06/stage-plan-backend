@@ -142,9 +142,11 @@ public class PerformanceService {
                 .maxAudience(performance.getMaxAudience())
                 .status(performance.getStatus())
                 .artistName(performance.getUser().getName())
+                .artistId(performance.getUser().getId())
+                .artistNickname(performance.getUser().getNickname())
+                .artistProfileImageUrl(performance.getUser().getProfileImageUrl())
                 .createdAt(performance.getCreatedAt())
                 .updatedAt(performance.getUpdatedAt())
                 .build();
     }
 }
-

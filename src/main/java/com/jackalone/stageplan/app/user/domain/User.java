@@ -36,6 +36,27 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "nickname")
+    private String nickname;
+
+    @Column(name = "instagram_id")
+    private String instagramId;
+
+    @Column(name = "band_name")
+    private String bandName;
+
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
+    @Column(name = "representative_video_url")
+    private String representativeVideoUrl;
+
+    @Column(name = "favorite_genres", length = 1000)
+    private String favoriteGenres;
+
+    @Column(name = "bio", length = 2000)
+    private String bio;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -97,4 +118,3 @@ public class User implements UserDetails {
         USER, ADMIN
     }
 }
-
