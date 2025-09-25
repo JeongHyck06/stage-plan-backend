@@ -5,6 +5,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,17 +29,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = getTokenFromRequest(request);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmailFromToken(token);
+        if (StringUtils.hasText(token)) {
+            try {
+                if (jwtTokenProvider.validateToken(token)) {
+                    String email = jwtTokenProvider.getEmailFromToken(token);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    email, null, List.of(new SimpleGrantedAuthority("USER"))
-            );
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            email, null, List.of(new SimpleGrantedAuthority("USER"))
+                    );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    // 토큰이 유효하지 않은 경우 401 응답
+                    sendUnauthorizedResponse(response, "Invalid or expired token");
+                    return;
+                }
+            } catch (Exception e) {
+                // 토큰 처리 중 오류 발생 시 401 응답
+                sendUnauthorizedResponse(response, "Token processing error: " + e.getMessage());
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write("{\"error\":\"" + message + "\",\"status\":401}");
+        response.getWriter().flush();
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
@@ -48,4 +69,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
-

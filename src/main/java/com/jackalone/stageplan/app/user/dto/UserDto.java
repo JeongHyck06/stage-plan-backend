@@ -51,6 +51,13 @@ public class UserDto {
         private Long id;
         private String email;
         private String name;
+        private String nickname;
+        private String instagramId;
+        private String bandName;
+        private String profileImageUrl;
+        private String representativeVideoUrl;
+        private String favoriteGenres;
+        private String bio;
     }
 
     @Data
@@ -63,5 +70,18 @@ public class UserDto {
         private Long expiresIn;
         private Response user;
     }
-}
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateProfileRequest {
+        private String nickname;
+        private String instagramId;
+        private String bandName;
+        private String profileImageUrl;
+        private String representativeVideoUrl;
+        private String favoriteGenres;
+        private String bio;
+    }
+}

@@ -69,6 +69,9 @@ public class PerformanceDto {
         private Integer maxAudience;
         private Performance.Status status;
         private String artistName;
+        private Long artistId;
+        private String artistNickname;
+        private String artistProfileImageUrl;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
     }
@@ -85,4 +88,3 @@ public class PerformanceDto {
         private LocalDateTime endDate;
     }
 }
-
