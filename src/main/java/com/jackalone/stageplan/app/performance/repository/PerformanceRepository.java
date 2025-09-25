@@ -23,8 +23,14 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(p.bandName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(p.genre) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+           "(:genre IS NULL OR :genre = '' OR LOWER(p.genre) LIKE LOWER(CONCAT('%', :genre, '%'))) AND " +
+           "(:bandName IS NULL OR :bandName = '' OR LOWER(p.bandName) LIKE LOWER(CONCAT('%', :bandName, '%'))) AND " +
            "p.status = 'ACTIVE'")
-    List<Performance> searchPerformances(@Param("keyword") String keyword);
+    List<Performance> searchPerformances(
+        @Param("keyword") String keyword,
+        @Param("genre") String genre,
+        @Param("bandName") String bandName
+    );
     
     List<Performance> findByPerformanceDateBetweenAndStatus(
         LocalDateTime startDate, 

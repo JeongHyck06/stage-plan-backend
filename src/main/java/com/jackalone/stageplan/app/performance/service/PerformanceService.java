@@ -55,9 +55,19 @@ public class PerformanceService {
     public List<PerformanceDto.Response> searchPerformances(PerformanceDto.SearchRequest request) {
         List<Performance> performances;
 
-        if (request.getKeyword() != null && !request.getKeyword().trim().isEmpty()) {
-            performances = performanceRepository.searchPerformances(request.getKeyword());
+        // 검색 조건이 있는 경우 검색 쿼리 사용
+        boolean hasSearchConditions = (request.getKeyword() != null && !request.getKeyword().trim().isEmpty()) ||
+                                    (request.getGenre() != null && !request.getGenre().trim().isEmpty()) ||
+                                    (request.getBandName() != null && !request.getBandName().trim().isEmpty());
+
+        if (hasSearchConditions) {
+            performances = performanceRepository.searchPerformances(
+                request.getKeyword(),
+                request.getGenre(),
+                request.getBandName()
+            );
         } else {
+            // 검색 조건이 없으면 모든 공연 조회
             performances = performanceRepository.findAll();
         }
 
