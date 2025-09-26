@@ -27,6 +27,20 @@ jwt:
     secret: ${JWT_SECRET:stageplanSecretKey123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890}
     expiration: 86400000 # 24 hours
 
+mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+        mail:
+            smtp:
+                auth: true
+                starttls:
+                    enable: true
+                ssl:
+                    trust: smtp.gmail.com
+
 logging:
     level:
         com.jackalone.stageplan: DEBUG
