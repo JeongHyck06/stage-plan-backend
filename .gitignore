@@ -38,4 +38,4 @@ out/
 .vscode/
 
 
-application-local.yml
+resources/application-local.yml
