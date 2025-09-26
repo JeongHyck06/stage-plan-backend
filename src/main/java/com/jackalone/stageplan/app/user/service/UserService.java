@@ -1,5 +1,6 @@
 package com.jackalone.stageplan.app.user.service;
 
+import com.jackalone.stageplan.app.email.service.EmailService;
 import com.jackalone.stageplan.app.user.domain.User;
 import com.jackalone.stageplan.app.user.dto.UserDto;
 import com.jackalone.stageplan.app.user.repository.UserRepository;
@@ -17,6 +18,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmailService emailService;
 
     public UserDto.Response signUp(UserDto.SignUpRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -32,6 +34,14 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
+        // 회원가입 후 이메일 인증 코드 자동 발송
+        try {
+            emailService.sendVerificationEmail(savedUser.getEmail());
+        } catch (Exception e) {
+            // 이메일 발송 실패 시 로그만 남기고 회원가입은 성공으로 처리
+            // 사용자가 나중에 수동으로 인증 코드를 요청할 수 있음
+        }
+
         return convertToResponse(savedUser);
     }
 
@@ -41,6 +51,11 @@ public class UserService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 이메일 인증 상태 확인
+        if (!user.getEmailVerified()) {
+            throw new IllegalArgumentException("이메일 인증이 완료되지 않았습니다. 이메일을 확인하고 인증을 완료해주세요.");
         }
 
         String accessToken = jwtTokenProvider.generateToken(user.getEmail());
@@ -90,6 +105,11 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
+        // 이메일 인증 상태 확인
+        if (!user.getEmailVerified()) {
+            throw new IllegalArgumentException("이메일 인증이 완료되지 않았습니다. 이메일을 확인하고 인증을 완료해주세요.");
+        }
+
         String newAccessToken = jwtTokenProvider.generateToken(user.getEmail());
         UserDto.Response userResponse = convertToResponse(user);
 
@@ -112,6 +132,7 @@ public class UserService {
                 .representativeVideoUrl(user.getRepresentativeVideoUrl())
                 .favoriteGenres(user.getFavoriteGenres())
                 .bio(user.getBio())
+                .emailVerified(user.getEmailVerified())
                 .build();
     }
 }

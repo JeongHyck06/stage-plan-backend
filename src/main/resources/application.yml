@@ -2,44 +2,46 @@ spring:
     profiles:
         active: local
     datasource:
-        url: jdbc:mysql://localhost:3306/stageplan?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+        url: ${DB_URL:jdbc:mysql://localhost:3306/stageplan?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
         username: ${DB_USERNAME:root}
-        password: ${DB_PASSWORD:password}
+        password: ${DB_PASSWORD:your_password_here}
         driver-class-name: com.mysql.cj.jdbc.Driver
     jpa:
         hibernate:
-            ddl-auto: update
-        show-sql: true
+            ddl-auto: ${JPA_DDL_AUTO:update}
+        show-sql: ${JPA_SHOW_SQL:true}
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.MySQLDialect
                 format_sql: true
     sql:
         init:
-            mode: always
+            mode: ${SQL_INIT_MODE:never}
             data-locations: classpath:data.sql
             continue-on-error: true
+    mail:
+        host: ${MAIL_HOST:smtp.gmail.com}
+        port: ${MAIL_PORT:587}
+        username: ${MAIL_USERNAME:your_email@gmail.com}
+        password: ${MAIL_PASSWORD:your_app_password_here}
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+                    ssl:
+                        trust: ${MAIL_HOST:smtp.gmail.com}
 
 server:
     port: 8080
 
 jwt:
-    secret: ${JWT_SECRET:stageplanSecretKey123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890}
-    expiration: 86400000 # 24 hours
+    secret: ${JWT_SECRET:your_jwt_secret_key_here_minimum_32_characters}
+    expiration: ${JWT_EXPIRATION:86400000} # 24 hours
 
-mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-    properties:
-        mail:
-            smtp:
-                auth: true
-                starttls:
-                    enable: true
-                ssl:
-                    trust: smtp.gmail.com
+app:
+    base-url: ${APP_BASE_URL:http://localhost:3000}
 
 logging:
     level:

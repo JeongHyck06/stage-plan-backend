@@ -1,5 +1,7 @@
 package com.jackalone.stageplan.global.security;
 
+import com.jackalone.stageplan.app.user.domain.User;
+import com.jackalone.stageplan.app.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -33,6 +36,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 if (jwtTokenProvider.validateToken(token)) {
                     String email = jwtTokenProvider.getEmailFromToken(token);
+                    
+                    // 사용자 존재 여부 및 이메일 인증 상태 확인
+                    User user = userRepository.findByEmail(email).orElse(null);
+                    if (user == null || !user.getEmailVerified()) {
+                        sendUnauthorizedResponse(response, "Email not verified or user not found");
+                        return;
+                    }
 
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             email, null, List.of(new SimpleGrantedAuthority("USER"))
