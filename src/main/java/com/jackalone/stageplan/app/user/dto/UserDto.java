@@ -58,6 +58,7 @@ public class UserDto {
         private String representativeVideoUrl;
         private String favoriteGenres;
         private String bio;
+        private Boolean emailVerified;
     }
 
     @Data

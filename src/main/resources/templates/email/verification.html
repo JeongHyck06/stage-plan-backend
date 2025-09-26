@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        <title>StagePlan 이메일 인증</title>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva,
+                    Verdana, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            .container {
+                background-color: #ffffff;
+                padding: 40px;
+                border-radius: 10px;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .logo {
+                font-size: 28px;
+                font-weight: bold;
+                color: #2c3e50;
+                margin-bottom: 10px;
+            }
+            .verification-code {
+                background-color: #3498db;
+                color: white;
+                padding: 15px 30px;
+                border-radius: 5px;
+                font-size: 24px;
+                font-weight: bold;
+                text-align: center;
+                margin: 20px 0;
+                letter-spacing: 3px;
+            }
+            .footer {
+                text-align: center;
+                margin-top: 30px;
+                color: #7f8c8d;
+                font-size: 14px;
+            }
+            .button {
+                display: inline-block;
+                background-color: #e74c3c;
+                color: white;
+                padding: 12px 30px;
+                text-decoration: none;
+                border-radius: 5px;
+                margin: 20px 0;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">StagePlan</div>
+                <h2>이메일 인증을 완료해주세요</h2>
+            </div>
+
+            <p>
+                안녕하세요! StagePlan에 가입해주셔서
+                감사합니다.
+            </p>
+
+            <p>
+                계정을 활성화하기 위해 아래 인증 코드를
+                사용해주세요:
+            </p>
+
+            <div
+                class="verification-code"
+                th:text="${verificationCode}"
+            >
+                123456
+            </div>
+
+            <p><strong>주의사항:</strong></p>
+            <ul>
+                <li>이 인증 코드는 10분 후에 만료됩니다</li>
+                <li>코드는 한 번만 사용할 수 있습니다</li>
+                <li>
+                    본인이 요청하지 않은 경우 이 이메일을
+                    무시하세요
+                </li>
+            </ul>
+
+            <div class="footer">
+                <p>
+                    이 이메일은 자동으로 발송되었습니다.
+                    회신하지 마세요.
+                </p>
+                <p>
+                    © 2025 StagePlan. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
