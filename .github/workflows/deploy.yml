@@ -135,13 +135,51 @@ jobs:
                       echo "컨테이너 상태를 확인하는 중..."
                       sudo docker ps -a --filter name=sikbbang-app
 
+                      # 컨테이너가 실행 중인지 확인
+                      if ! sudo docker ps --filter name=sikbbang-app --filter status=running | grep -q sikbbang-app; then
+                        echo "ERROR: 컨테이너가 실행되지 않았습니다. 컨테이너 로그를 확인합니다:"
+                        sudo docker logs sikbbang-app --tail 50
+                        exit 1
+                      fi
+
                       # 애플리케이션 헬스 체크
                       echo "애플리케이션이 시작될 때까지 대기 중..."
                       for i in {1..30}; do
+                        # 먼저 컨테이너가 여전히 실행 중인지 확인
+                        if ! sudo docker ps --filter name=sikbbang-app --filter status=running | grep -q sikbbang-app; then
+                          echo "ERROR: 컨테이너가 중지되었습니다. 로그를 확인합니다:"
+                          sudo docker logs sikbbang-app --tail 50
+                          exit 1
+                        fi
+
+                        # 헬스 체크 시도
                         if curl -f http://localhost:8080/actuator/health >/dev/null 2>&1; then
                           echo "애플리케이션이 성공적으로 시작되었습니다!"
+                          curl http://localhost:8080/actuator/health
                           break
                         fi
+                        
                         echo "시도 $i/30: 애플리케이션 시작을 기다리는 중..."
+                        
+                        # 마지막 몇 번의 시도에서는 더 자세한 정보 출력
+                        if [ $i -gt 25 ]; then
+                          echo "컨테이너 로그 (최근 10줄):"
+                          sudo docker logs sikbbang-app --tail 10
+                          echo "포트 8080 연결 테스트:"
+                          nc -zv localhost 8080 || echo "포트 8080에 연결할 수 없습니다"
+                        fi
+                        
                         sleep 10
                       done
+
+                      # 헬스 체크 실패 시 상세 정보 출력
+                      if ! curl -f http://localhost:8080/actuator/health >/dev/null 2>&1; then
+                        echo "ERROR: 애플리케이션 헬스 체크에 실패했습니다."
+                        echo "컨테이너 상태:"
+                        sudo docker ps -a --filter name=sikbbang-app
+                        echo "컨테이너 로그 (최근 100줄):"
+                        sudo docker logs sikbbang-app --tail 100
+                        echo "포트 상태 확인:"
+                        sudo netstat -tlnp | grep :8080 || echo "포트 8080이 열려있지 않습니다"
+                        exit 1
+                      fi
