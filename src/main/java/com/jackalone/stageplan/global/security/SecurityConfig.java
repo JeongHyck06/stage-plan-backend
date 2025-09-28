@@ -30,13 +30,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        // 이메일 인증 관련 엔드포인트는 인증 없이 접근 가능
                         .requestMatchers("/api/email/**").permitAll()
-                        // 인증 관련 엔드포인트는 인증 없이 접근 가능
                         .requestMatchers("/api/auth/**").permitAll()
-                        // 공연 조회는 인증 없이 접근 가능
                         .requestMatchers("GET", "/api/performances/**").permitAll()
-                        // 나머지 모든 요청은 인증 필요
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
