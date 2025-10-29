@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+// todo 서비스 레이어로 분리하기
 @RestController
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
@@ -46,8 +46,17 @@ public class EmailController {
                     request.getEmail()
             ));
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            // 빈도 제한 등의 비즈니스 로직 예외
+            if (e.getMessage().contains("너무 빈번합니다")) {
+                return ResponseEntity.badRequest()
+                        .body(EmailResponse.failure(e.getMessage()));
+            }
             log.error("이메일 발송 중 오류 발생: {}", request.getEmail(), e);
+            return ResponseEntity.internalServerError()
+                    .body(EmailResponse.failure("이메일 발송 중 오류가 발생했습니다."));
+        } catch (Exception e) {
+            log.error("이메일 발송 중 예상치 못한 오류 발생: {}", request.getEmail(), e);
             return ResponseEntity.internalServerError()
                     .body(EmailResponse.failure("이메일 발송 중 오류가 발생했습니다."));
         }

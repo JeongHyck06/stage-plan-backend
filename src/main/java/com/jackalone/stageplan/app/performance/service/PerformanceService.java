@@ -67,8 +67,8 @@ public class PerformanceService {
                 request.getBandName()
             );
         } else {
-            // 검색 조건이 없으면 모든 공연 조회
-            performances = performanceRepository.findAll();
+            // 검색 조건이 없으면 빈 리스트 반환
+            performances = List.of();
         }
 
         return performances.stream()

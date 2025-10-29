@@ -24,4 +24,6 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     @Modifying
     @Query("DELETE FROM EmailVerification e WHERE e.email = :email")
     void deleteByEmail(@Param("email") String email);
+
+    Optional<EmailVerification> findByEmailAndCreatedAtAfter(String email, LocalDateTime createdAt);
 }
